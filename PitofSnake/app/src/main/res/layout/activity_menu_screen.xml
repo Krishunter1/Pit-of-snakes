@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="kristof.pitofsnake.MenuScreen">
+
+    <EditText
+        android:id="@+id/PitofSnake"
+        android:layout_width="321dp"
+        android:layout_height="75dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:selectAllOnFocus="true"
+        android:text="Pits of Snakes"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        tools:layout_editor_absoluteX="32dp"
+        tools:layout_editor_absoluteY="29dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="167dp"
+        android:layout_height="80dp"
+        android:onClick="startGame"
+        android:text="Play Game"
+        tools:layout_editor_absoluteX="99dp"
+        tools:layout_editor_absoluteY="143dp"
+        tools:ignore="OnClick" />
+</android.support.constraint.ConstraintLayout>
