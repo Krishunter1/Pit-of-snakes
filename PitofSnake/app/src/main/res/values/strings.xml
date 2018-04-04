@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">PitofSnake</string>
+    <string name="start">PLAY GAME</string>
+    <string name="menu">MENU</string>
+    <string name="sound">SOUND EFFECTS</string>
+    <string name="music">MUSIC</string>
+    <string name="back">BACK</string>
+    <string name="credits">CREDITS</string>
 </resources>
