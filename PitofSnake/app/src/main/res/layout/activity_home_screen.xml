@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background = "@drawable/backgroundimage"
     tools:context=".HomeScreen">
 
     <ImageButton
@@ -19,6 +20,7 @@
         android:onClick="onClickStart"
         android:scaleType="fitXY"
         android:src="@drawable/startbutton"
+        android:soundEffectsEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageButton4"
         app:layout_constraintHorizontal_bias="0.0"
@@ -35,6 +37,7 @@
         android:onClick="onClickSend"
         android:scaleType="fitXY"
         android:src="@drawable/menubutton"
+        android:soundEffectsEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageButton3" />
