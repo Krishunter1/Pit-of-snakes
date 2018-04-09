@@ -8,19 +8,19 @@ import android.view.View;
 import android.view.WindowManager;
 
 public class HomeScreen extends Activity {
-
+    private static MediaPlayer player;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_home_screen);
-        MediaPlayer player = MediaPlayer.create(this, R.raw.backgroundsong);
+        player = MediaPlayer.create(this, R.raw.backgroundsong);
         player.setLooping(true);
         player.start();
 
-
     }
+
 
     public void onClickSend(View view) {
         MediaPlayer buttonsound = MediaPlayer.create(this, R.raw.buttonsound);
