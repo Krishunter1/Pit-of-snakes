@@ -16,7 +16,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".PitofSnake" />
-        <activity android:name=".MenuScreen" ></activity>
+        <activity android:name=".MenuScreen" />
+        <activity android:name=".CreditsActivity"></activity>
     </application>
 
 </manifest>
