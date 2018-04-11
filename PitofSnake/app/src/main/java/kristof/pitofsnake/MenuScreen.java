@@ -8,14 +8,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import static junit.runner.BaseTestRunner.savePreferences;
-
 public class MenuScreen extends Activity {
     private static final String IMAGE_NUMBER_ONE = "image-number-one";
     private static final String IMAGE_NUMBER_TWO = "image-number-two";
+    private static final String MUSIC_VALUE = "music_value";
     private int current_image1;
     private int current_image2;
-
+    private boolean decision = true;
     int[] images = {R.drawable.speaker1, R.drawable.muteicon};
     ImageView imgView;
     @Override
@@ -28,6 +27,7 @@ public class MenuScreen extends Activity {
         if (savedInstanceState != null) {
             current_image1 = savedInstanceState.getInt(IMAGE_NUMBER_ONE);
             current_image2 = savedInstanceState.getInt(IMAGE_NUMBER_TWO);
+            decision = savedInstanceState.getBoolean(MUSIC_VALUE);
             setImage();
         }
 
@@ -55,6 +55,12 @@ public class MenuScreen extends Activity {
         current_image2++;
         current_image2 = current_image2 % images.length;
         imgView.setImageResource(images[current_image2]);
+        if(decision)
+            decision = false;
+        else if(!decision)
+            decision = true;
+        HomeScreen home = new HomeScreen();
+        home.startBackgroundmusic(decision);
     }
 
     public void onClickCredits( View view ) {
@@ -67,6 +73,7 @@ public class MenuScreen extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(IMAGE_NUMBER_ONE, current_image1);
         outState.putInt(IMAGE_NUMBER_TWO, current_image2);
+        outState.putBoolean(MUSIC_VALUE, decision);
         super.onSaveInstanceState(outState);
 
     }
@@ -76,6 +83,7 @@ public class MenuScreen extends Activity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(IMAGE_NUMBER_ONE, current_image1);
         editor.putInt(IMAGE_NUMBER_TWO, current_image2);
+        editor.putBoolean(MUSIC_VALUE, decision);
         editor.commit();   // I missed to save the data to preference here,.
     }
 
@@ -83,6 +91,7 @@ public class MenuScreen extends Activity {
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         current_image1 = sharedPreferences.getInt(IMAGE_NUMBER_ONE, current_image1);
         current_image2 = sharedPreferences.getInt(IMAGE_NUMBER_TWO, current_image2);
+        decision = sharedPreferences.getBoolean(MUSIC_VALUE, decision);
 
         setImage();
 
