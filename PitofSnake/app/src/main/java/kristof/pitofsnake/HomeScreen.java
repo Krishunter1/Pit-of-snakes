@@ -57,7 +57,7 @@ public class HomeScreen extends Activity {
     public void onClickStart(View view) {
         MediaPlayer buttonsound = MediaPlayer.create(this, R.raw.buttonsound);
         buttonsound.start();
-        Intent intent = new Intent(this, ModeActivity.class);
+        Intent intent = new Intent(this, PitofSnake.class);
         startActivity(intent);
     }
 

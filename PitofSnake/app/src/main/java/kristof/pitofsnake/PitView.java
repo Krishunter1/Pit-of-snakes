@@ -14,92 +14,98 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.Random;
 
-//the engine of the game, early prelimery stage//
 class PitView extends SurfaceView implements Runnable {
 
     // All the code will run separately to the UI
-    private Thread m_Thread = null;
+    private Thread thread = null;
     // This variable determines when the game is playing
     // It is declared as volatile because
     // it can be accessed from inside and outside the thread
-    private volatile boolean m_Playing;
+    private volatile boolean playing;
 
     // This is what we draw on
-    private Canvas m_Canvas;
+    private Canvas canvas;
     // This is required by the Canvas class to do the drawing
-    private SurfaceHolder m_Holder;
+    private SurfaceHolder holder;
     // This lets us control colors etc
-    private Paint m_Paint;
+    private Paint paint;
 
     // This will be a reference to the Activity
     private Context m_context;
 
     // Sound
-    private SoundPool m_SoundPool;
+    private SoundPool SoundPool;
     private int m_get_mouse_sound = -1;
     private int m_dead_sound = -1;
 
     // For tracking movement m_Direction
     public enum Direction {UP, RIGHT, DOWN, LEFT}
     // Start by heading to the right
-    private Direction m_Direction = Direction.RIGHT;
+    public static Direction direction = Direction.RIGHT;
 
     // What is the screen resolution
-    private int m_ScreenWidth;
-    private int m_ScreenHeight;
+    private int screenWidth;
+    private int screenHeight;
 
     // Control pausing between updates
-    private long m_NextFrameTime;
+    private long nextFrameTime;
     // Update the game 10 times per second
-    private final long FPS = 10;
+    private  long FPS = 2;
     // There are 1000 milliseconds in a second
     private final long MILLIS_IN_A_SECOND = 1000;
     // We will draw the frame much more often
 
-    // The current m_Score
-    private int m_Score;
-
     // The location in the grid of all the segments
-    private int[] m_SnakeXs;
-    private int[] m_SnakeYs;
+    public static int[] snakeXs;
+    public static int[] snakeYs;
 
     // How long is the snake at the moment
-    private int m_SnakeLength;
+    private int snakeLength;
 
     // Where is the mouse
-    private int m_MouseX;
-    private int m_MouseY;
+    private int mouseX;
+    private int mouseY;
+
+    //location of speed upgrade
+    private int speedX;
+    private int speedY;
+
+    private int massX;
+    private int massY;
+
+    private int score;
+
 
     // The size in pixels of a snake segment
-    private int m_BlockSize;
+    private int blockSize;
 
     // The size in segments of the playable area
-    private final int NUM_BLOCKS_WIDE = 40;
-    private int m_NumBlocksHigh; // determined dynamically
+    private final int NUM_BLOCKS_WIDE = 25;
+    private int numBlocksHigh; // determined dynamically
 
     public PitView(Context context, Point size) {
         super(context);
 
         m_context = context;
 
-        m_ScreenWidth = size.x;
-        m_ScreenHeight = size.y;
+        screenWidth = size.x;
+        screenHeight = size.y;
 
         //Determine the size of each block/place on the game board
-        m_BlockSize = m_ScreenWidth / NUM_BLOCKS_WIDE;
+        blockSize = screenWidth / NUM_BLOCKS_WIDE;
         // How many blocks of the same size will fit into the height
-        m_NumBlocksHigh = m_ScreenHeight / m_BlockSize;
+        numBlocksHigh = screenHeight / blockSize;
 
         // Set the sound up
         loadSound();
 
         // Initialize the drawing objects
-        m_Holder = getHolder();
-        m_Paint = new Paint();
+        holder = getHolder();
+        paint = new Paint();
 
         // If you score 200 you are rewarded with a crash achievement!
-        m_SnakeXs = new int[200];
-        m_SnakeYs = new int[200];
+        snakeXs = new int[200];
+        snakeYs = new int[200];
 
         // Start the game
         startGame();
@@ -107,22 +113,22 @@ class PitView extends SurfaceView implements Runnable {
 
     public void startGame() {
         // Start with just a head, in the middle of the screen
-        m_SnakeLength = 1;
-        m_SnakeXs[0] = NUM_BLOCKS_WIDE / 2;
-        m_SnakeYs[0] = m_NumBlocksHigh / 2;
+        snakeLength = 1;
+        snakeXs[0] = NUM_BLOCKS_WIDE / 2;
+        snakeYs[0] = numBlocksHigh / 2;
 
         // And a mouse to eat
         spawnMouse();
 
         // Reset the m_Score
-        m_Score = 0;
+        score = 0;
 
         // Setup m_NextFrameTime so an update is triggered immediately
-        m_NextFrameTime = System.currentTimeMillis();
+        nextFrameTime = System.currentTimeMillis();
     }
 
     public void loadSound() {
-        m_SoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        SoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         try {
             // Create objects of the 2 required classes
             // Use m_Context because this is a reference to the Activity
@@ -131,10 +137,10 @@ class PitView extends SurfaceView implements Runnable {
 
             // Prepare the two sounds in memory
             descriptor = assetManager.openFd("get_mouse_sound.ogg");
-            m_get_mouse_sound = m_SoundPool.load(descriptor, 0);
+            m_get_mouse_sound = SoundPool.load(descriptor, 0);
 
             descriptor = assetManager.openFd("death_sound.ogg");
-            m_dead_sound = m_SoundPool.load(descriptor, 0);
+            m_dead_sound = SoundPool.load(descriptor, 0);
 
         } catch (IOException e) {
             // Error
@@ -143,42 +149,80 @@ class PitView extends SurfaceView implements Runnable {
 
     public void spawnMouse() {
         Random random = new Random();
-        m_MouseX = random.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
-        m_MouseY = random.nextInt(m_NumBlocksHigh - 1) + 1;
+        mouseX = random.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
+        mouseY = random.nextInt(numBlocksHigh - 1) + 1;
+}
+
+    private void eatMouse() {
+        snakeLength++;
+        spawnMouse();
+        score = score + 1;
+        SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+    }
+    public void spawnSpeed() {
+        if( score == 10 || score == 25 || score == 40 || score ==55) {
+            Random random2 = new Random();
+            speedX = random2.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
+            speedY = random2.nextInt(numBlocksHigh - 1) + 1;
+        }
     }
 
-    private void eatMouse(){
-        m_SnakeLength++;
-        spawnMouse();
-        m_Score = m_Score + 1;
-        m_SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+    public void spawnMass() {
+        if( score == 15 || score == 30 || score == 50) {
+            Random random3 = new Random();
+            massX = random3.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
+            massY = random3.nextInt(numBlocksHigh - 1) + 1;
+        }
+    }
+
+    private void eatSpeed() {
+        if( FPS == 2){
+            FPS = 4;
+        }
+        else if (FPS == 4) {
+            FPS = 6;
+        }
+        else if (FPS == 6) {
+            FPS = 8;
+        }
+        spawnSpeed();
+        score = score + 1;
+        SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+    }
+
+
+    private void eatMass() {
+        snakeLength = snakeLength + 2;
+        spawnMass();
+        score = score + 2;
+        SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
     }
 
     private void moveSnake(){
         // Start moving the snake
-        for (int i = m_SnakeLength; i > 0; i--) {
+        for (int i = snakeLength; i > 0; i--) {
             // starting from back and moving the pixel foward to the one infont
             //head is not included because head has nothing in front
-            m_SnakeXs[i] = m_SnakeXs[i - 1];
-            m_SnakeYs[i] = m_SnakeYs[i - 1];
+            snakeXs[i] = snakeXs[i - 1];
+            snakeYs[i] = snakeYs[i - 1];
         }
 
         // Move head to direction chosen
-        switch (m_Direction) {
+        switch (direction) {
             case UP:
-                m_SnakeYs[0]--;
+                snakeYs[0]--;
                 break;
 
             case RIGHT:
-                m_SnakeXs[0]++;
+                snakeXs[0]++;
                 break;
 
             case DOWN:
-                m_SnakeYs[0]++;
+                snakeYs[0]++;
                 break;
 
             case LEFT:
-                m_SnakeXs[0]--;
+                snakeXs[0]--;
                 break;
         }
     }
@@ -186,13 +230,13 @@ class PitView extends SurfaceView implements Runnable {
     private boolean detectDeath(){
         boolean dead = false;
         //check if a wall has been hit on the edge of the screen
-        if (m_SnakeXs[0] == -1) dead = true;
-        if (m_SnakeXs[0] >= NUM_BLOCKS_WIDE) dead = true;
-        if (m_SnakeYs[0] == -1) dead = true;
-        if (m_SnakeYs[0] == m_NumBlocksHigh) dead = true;
+        if (snakeXs[0] == -1) dead = true;
+        if (snakeXs[0] >= NUM_BLOCKS_WIDE) dead = true;
+        if (snakeYs[0] == -1) dead = true;
+        if (snakeYs[0] == numBlocksHigh) dead = true;
         //check if player ran head into the body
-        for (int i = m_SnakeLength - 1; i > 0; i--) {
-            if ((i > 4) && (m_SnakeXs[0] == m_SnakeXs[i]) && (m_SnakeYs[0] == m_SnakeYs[i])) {
+        for (int i = snakeLength - 1; i > 0; i--) {
+            if ((i > 4) && (snakeXs[0] == snakeXs[i]) && (snakeYs[0] == snakeYs[i])) {
                 dead = true;
             }
         }
@@ -201,53 +245,61 @@ class PitView extends SurfaceView implements Runnable {
     }
 
     public void updateGame() {
-        if (m_SnakeXs[0] == m_MouseX && m_SnakeYs[0] == m_MouseY) {
+        if (snakeXs[0] == mouseX && snakeYs[0] == mouseY) {
             eatMouse();
+        }
+        moveSnake();
+        if (snakeXs[0] == speedX && snakeYs[0] == speedY) {
+            eatSpeed();
+        }
+        moveSnake();
+        if (snakeXs[0] == massX && snakeYs[0] == massY) {
+            eatMass();
         }
         moveSnake();
         if (detectDeath()) {
             //start again
-            m_SoundPool.play(m_dead_sound, 1, 1, 0, 0, 1);
+            SoundPool.play(m_dead_sound, 1, 1, 0, 0, 1);
 
             startGame();
         }
     }
 
     public void drawGame() {
-        if (m_Holder.getSurface().isValid()) {
-            m_Canvas = m_Holder.lockCanvas();
+        if (holder.getSurface().isValid()) {
+            canvas = holder.lockCanvas();
             //background colour
-            m_Canvas.drawColor(Color.argb(255, 120, 197, 87));
+            canvas.drawColor(Color.argb(255, 120, 197, 87));
             //Snake colour
-            m_Paint.setColor(Color.argb(255, 255, 255, 255));
+            paint.setColor(Color.argb(255, 255, 255, 255));
 
-            m_Paint.setTextSize(30);
-            m_Canvas.drawText("Score:" + m_Score, 10, 30, m_Paint);
+            paint.setTextSize(30);
+            canvas.drawText("Score:" + score, 10, 30, paint);
 
             //Draw the snake
-            for (int i = 0; i < m_SnakeLength; i++) {
-                m_Canvas.drawRect(m_SnakeXs[i] * m_BlockSize,
-                        (m_SnakeYs[i] * m_BlockSize),
-                        (m_SnakeXs[i] * m_BlockSize) + m_BlockSize,
-                        (m_SnakeYs[i] * m_BlockSize) + m_BlockSize,
-                        m_Paint);
+            for (int i = 0; i < snakeLength; i++) {
+                canvas.drawRect(snakeXs[i] * blockSize,
+                        (snakeYs[i] * blockSize),
+                        (snakeXs[i] * blockSize) + blockSize,
+                        (snakeYs[i] * blockSize) + blockSize,
+                        paint);
             }
 
             //draw the mouse
-            m_Canvas.drawRect(m_MouseX * m_BlockSize,
-                    (m_MouseY * m_BlockSize),
-                    (m_MouseX * m_BlockSize) + m_BlockSize,
-                    (m_MouseY * m_BlockSize) + m_BlockSize,
-                    m_Paint);
+            canvas.drawRect(mouseX * blockSize,
+                    (mouseY * blockSize),
+                    (mouseX * blockSize) + blockSize,
+                    (mouseY * blockSize) + blockSize,
+                    paint);
 
             // Draw the whole frame
-            m_Holder.unlockCanvasAndPost(m_Canvas);
+            holder.unlockCanvasAndPost(canvas);
         }
     }
 
     public boolean checkForUpdate() {
-        if(m_NextFrameTime <= System.currentTimeMillis()){
-            m_NextFrameTime =System.currentTimeMillis() + MILLIS_IN_A_SECOND / FPS;
+        if(nextFrameTime <= System.currentTimeMillis()){
+            nextFrameTime =System.currentTimeMillis() + MILLIS_IN_A_SECOND / FPS;
             return true;
         }
 
@@ -258,7 +310,7 @@ class PitView extends SurfaceView implements Runnable {
     @Override
     public void run() {
         // The check for m_Playing prevents a crash at the start
-        while (m_Playing) {
+        while (playing) {
 
             // Update 10 times a second
             if(checkForUpdate()) {
@@ -270,18 +322,18 @@ class PitView extends SurfaceView implements Runnable {
     }
 
     public void pause() {
-        m_Playing = false;
+        playing = false;
         try {
-            m_Thread.join();
+            thread.join();
         } catch (InterruptedException e) {
             // Error
         }
     }
 
     public void resume() {
-        m_Playing = true;
-        m_Thread = new Thread(this);
-        m_Thread.start();
+        playing = true;
+        thread = new Thread(this);
+        thread.start();
     }
 
 }
