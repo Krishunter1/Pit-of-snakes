@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -20,12 +21,14 @@ public class HomeScreen extends Activity {
         setContentView(R.layout.activity_home_screen);
         player = MediaPlayer.create(this, R.raw.backgroundsong);
         player.setLooping(true);
-        startBackgroundmusic(musicPlay);
-
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        musicPlay = sharedPreferences.getBoolean("music_value", true);
+        if(musicPlay) {
+            startBackgroundmusic(musicPlay);
+        }
     }
 
     public void startBackgroundmusic(boolean value) {
-        musicPlay = value;
         if(value) {
             player.start();
         }

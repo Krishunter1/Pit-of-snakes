@@ -265,6 +265,7 @@ class PitView extends SurfaceView implements Runnable {
 
             context = PitofSnake.getContext();
             Intent intent = new Intent(context, ScoreActivity.class);
+            intent.putExtra("score",score);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
