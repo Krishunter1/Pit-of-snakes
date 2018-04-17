@@ -1,6 +1,7 @@
 package kristof.pitofsnake;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -74,6 +75,7 @@ class PitView extends SurfaceView implements Runnable {
     private int massY;
 
     private int score;
+    public static Context context;
 
 
     // The size in pixels of a snake segment
@@ -261,7 +263,10 @@ class PitView extends SurfaceView implements Runnable {
             //start again
             SoundPool.play(m_dead_sound, 1, 1, 0, 0, 1);
 
-            startGame();
+            context = PitofSnake.getContext();
+            Intent intent = new Intent(context, ScoreActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         }
     }
 

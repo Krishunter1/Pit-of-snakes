@@ -1,6 +1,7 @@
 package kristof.pitofsnake;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
@@ -21,6 +22,7 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
     private static final int SWIPE_MIN_DISTANCE = 5;
     private static final int SWIPE_MAX_OFF_PATH = 3000;
     private static final int SWIPE_THRESHOLD_VELOCITY = 1500;
+    public static Context mContext;
     private GestureDetectorCompat detector;
 
     @Override
@@ -28,13 +30,14 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
         super.onCreate(savedInstanceState);
         detector = new GestureDetectorCompat(this,this);
 
+
         //find out the width and height of the screen
         Display display = getWindowManager().getDefaultDisplay();
 
         // Load the resolution into a Point object
         Point size = new Point();
         display.getSize(size);
-
+        mContext = getBaseContext();
         // Create a new View based on the SnakeView class
         pitView = new PitView(this, size);
 
@@ -51,6 +54,10 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
             return true;
         }
         return super.onTouchEvent(event);
+    }
+
+    public static Context getContext() {
+        return mContext;
     }
 
     @Override
