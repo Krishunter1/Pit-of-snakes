@@ -6,4 +6,6 @@
     <string name="music">MUSIC</string>
     <string name="back">BACK</string>
     <string name="credits">CREDITS</string>
+    <string name="facebook_app_id">2083518661930321</string>
+    <string name="facebook_login_protocol_scheme">fb2083518661930321</string>
 </resources>
