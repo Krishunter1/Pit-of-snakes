@@ -2,6 +2,7 @@ package kristof.pitofsnake;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
@@ -101,6 +102,12 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
     public void onLongPress(MotionEvent e) {
         //filler method
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, HomeScreen.class);
+        startActivity(intent);
     }
 
     @Override

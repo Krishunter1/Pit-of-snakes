@@ -23,6 +23,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
@@ -31,10 +32,6 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
-import java.lang.annotation.Target;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class ScoreActivity extends Activity {
 
     private static final String HIGH_SCORE = "high-score";
@@ -42,6 +39,7 @@ public class ScoreActivity extends Activity {
     private int highScore = 0;
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
+    private String quote;
 
 
     @Override
@@ -70,16 +68,15 @@ public class ScoreActivity extends Activity {
         if(scored > highScore) {
             highScore = scored;
             setText1();
+            quote = "Hey guys I just made a new High Score of " + scored + " in the game Pit of Snakes. Try this game out!";
             SharedPreferences.Editor editor = settings.edit();
             editor.putInt(HIGH_SCORE, highScore);
             editor.commit();
         }
         else {
             setText2();
+            quote = "Hey guys I just scored " + scored + " in the game Pit of Snakes. Try this game out!";
         }
-
-
-
     }
 
     private void setText1() {
@@ -99,9 +96,9 @@ public class ScoreActivity extends Activity {
 
     public void onClickShare(View view)
     {
-        ShareLinkContent linkContent = new ShareLinkContent.Builder()
-                .setQuote("this is useful")
-                .setContentUrl(Uri.parse("https://youtube.com"))
+        ShareContent linkContent = new ShareLinkContent.Builder()
+                .setQuote(quote)
+                .setContentUrl(Uri.parse("https://drive.google.com/file/d/15eXjPUdGSxLfpr4b7ovlyMtOGzzyLd58/view?usp=sharing"))
                 .build();
         if(ShareDialog.canShow(ShareLinkContent.class))
         {
