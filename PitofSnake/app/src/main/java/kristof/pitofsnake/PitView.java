@@ -1,5 +1,5 @@
 package kristof.pitofsnake;
-//coded by Kristof
+//coded by Kristof and Ronan
 //The reason the game is not running on Matrixes but instead uses Draw class
 //is because the Draw class was the easiest way to implement the old style Snake game feel
 //while being able to implement more modern touches with power ups.
