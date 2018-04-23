@@ -12,27 +12,31 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-//THe game in its current stage is pretty simplistic, we had the menu screen to play the game and go into options
-//however, prehaps becasue we were using Dropbox until now, the activites and Layouts havent fully passed on
-//Hence the menu right now is just a barebone play buttom
-
+//Coded by Kristof
+//The activity calls a PitView Object that acts as the View for this activity
+//Gestrue detector is also implemented to recognise onFlick commands, which is used for our swiping controls
+//Vibration is also present here so the device can vibrate when food is eaten or player dies.
+//Also a activity with choice of game mode wasin't made as we were having difficult implementing it properly
 public class PitofSnake extends Activity implements GestureDetector.OnGestureListener {
 
     // Declare an instance of SnakeView
     PitView pitView;
-    // We will initialize it in onCreate
-    // once we have more details about the Player's device
+    //Declared values for onFLick calculation
     private static final int SWIPE_MIN_DISTANCE = 100;
     private static final int SWIPE_MAX_OFF_PATH = 3000;
     private static final int SWIPE_THRESHOLD_VELOCITY = 1500;
     public static Context mContext;
+    //Sets up variable to act as the detector for input
     private GestureDetectorCompat detector;
+    //Sets up variable to set up vibrations
     public static Vibrator vibrator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Initilaise the variables as new GestureDetector
         detector = new GestureDetectorCompat(this,this);
+        //Ask device to allow vibrations
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -46,7 +50,6 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
         // Create a new View based on the SnakeView class
         pitView = new PitView(this, size);
 
-
         // Make snakeView the default view of the Activity
         setContentView(pitView);
     }
@@ -54,6 +57,7 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
     // Start the thread in snakeView when this Activity
     // is shown to the player
 
+    //Set up a onTouchEvent listener
     @Override
     public boolean onTouchEvent(MotionEvent event){
         if (this.detector.onTouchEvent(event)) {
@@ -79,7 +83,7 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
         super.onPause();
         pitView.pause();
     }
-
+    //All of these are called when GestureDetector interface is implemented, most of these are empty except onFlick
     @Override
     public boolean onDown(MotionEvent e) {
         //filler methord

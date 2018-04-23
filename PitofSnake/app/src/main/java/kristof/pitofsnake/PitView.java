@@ -1,5 +1,11 @@
 package kristof.pitofsnake;
-
+//coded by Kristof
+//The reason the game is not running on Matrixes but instead uses Draw class
+//is because the Draw class was the easiest way to implement the old style Snake game feel
+//while being able to implement more modern touches with power ups.
+//Also a activity with choice of game mode wasin't made as we were having difficult implementing it properly
+//However the power ups act as if the game modes were selected, so the player is able to pick them up
+//and change there game experience if they choose to do so.
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,56 +27,52 @@ import java.util.Random;
 
 class PitView extends SurfaceView implements Runnable {
 
-    // All the code will run separately to the UI
+    // Allow code to run seperate to UI
     private Thread thread = null;
-    // This variable determines when the game is playing
-    // It is declared as volatile because
-    // it can be accessed from inside and outside the thread
+    //Checks if the game is running, volatile so can be acessed outside and inside thread
     private volatile boolean playing;
 
-    // This is what we draw on
+    // set up canvas for drawing
     private Canvas canvas;
     // This is required by the Canvas class to do the drawing
     private SurfaceHolder holder;
-    // This lets us control colors etc
+    // Variables to set up different colours for the snake/food/powerup
     private Paint paint;
     private Paint paint2;
     private Paint paint3;
 
 
-    // This will be a reference to the Activity
+    // Reference to activity
     private Context m_context;
 
-    // Sound
+    // Set up sound effects
     private SoundPool SoundPool;
     private int m_get_mouse_sound = -1;
     private int m_dead_sound = -1;
 
-    // For tracking movement m_Direction
+    // Track movement in Direction
     public enum Direction {UP, RIGHT, DOWN, LEFT}
     // Start by heading to the right
     public static Direction direction = Direction.RIGHT;
 
-    // What is the screen resolution
+    // Find out the screen resolution of devices
     private int screenWidth;
     private int screenHeight;
 
     // Control pausing between updates
     private long nextFrameTime;
-    // Update the game 10 times per second
+    // Update game 2 times a second, starting slow and increasing with powerup.
     private  long FPS = 2;
-    // There are 1000 milliseconds in a second
     private final long MILLIS_IN_A_SECOND = 1000;
-    // We will draw the frame much more often
 
     // The location in the grid of all the segments
     public static int[] snakeXs;
     public static int[] snakeYs;
 
-    // How long is the snake at the moment
+    // Lenght of the snake
     private int snakeLength;
 
-    // Where is the mouse
+    // X and Y loctation of the mouse
     private int mouseX;
     private int mouseY;
 
@@ -78,10 +80,13 @@ class PitView extends SurfaceView implements Runnable {
     private int speedX;
     private int speedY;
 
+    // location of mass upgrade
     private int massX;
     private int massY;
 
-    private boolean soundfx; //stores the user selection of sound effects
+    //stores the user selection of sound effects
+    private boolean soundfx;
+    //Set up score variable
     private int score;
     public static Context context;
 
@@ -92,6 +97,7 @@ class PitView extends SurfaceView implements Runnable {
     private final int NUM_BLOCKS_WIDE = 25;
     private int numBlocksHigh; // determined dynamically
 
+    //Setting up the constructor
     public PitView(Context context, Point size) {
         super(context);
 
@@ -118,7 +124,7 @@ class PitView extends SurfaceView implements Runnable {
         paint2 = new Paint();
         paint3 = new Paint();
 
-        // If you score 200 you are rewarded with a crash achievement!
+        // If you score 200 you are riewarded with a crash achevement!
         snakeXs = new int[200];
         snakeYs = new int[200];
 
@@ -132,9 +138,11 @@ class PitView extends SurfaceView implements Runnable {
         snakeXs[0] = NUM_BLOCKS_WIDE / 2;
         snakeYs[0] = numBlocksHigh / 2;
 
-        // And a mouse to eat
+        // And a to a mouse to screen
         spawnMouse();
+        //Add a speed powerup to screen
         spawnSpeed();
+        //Add a mass powerup to screen
         spawnMass();
 
         // Reset the m_Score
@@ -163,31 +171,32 @@ class PitView extends SurfaceView implements Runnable {
             // Error
         }
     }
-
+    //Class to spawn mouse
     public void spawnMouse() {
         Random random = new Random();
         mouseX = random.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
         mouseY = random.nextInt(numBlocksHigh - 1) + 1;
     }
-
+    //When mouse is eaten, increasing snake lenght by 1, spawn another mouse, incremeent score by 1 and play the sound effect
     private void eatMouse() {
         snakeLength++;
         spawnMouse();
         score = score + 1;
         playSoundEffectsMouse();
     }
+    //Class to spawn Speed
     public void spawnSpeed() {
         Random random2 = new Random();
         speedX = random2.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
         speedY = random2.nextInt(numBlocksHigh - 1) + 1;
     }
-
+    //Class to spawn Mass
     public void spawnMass() {
         Random random3 = new Random();
         massX = random3.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
         massY = random3.nextInt(numBlocksHigh - 1) + 1;
     }
-
+    //When speed is eating ,increase the FPS of the game(speed of it) and increment score by 1, play sound effect of eating
     private void eatSpeed() {
         if( FPS == 2){
             FPS = 4;
@@ -221,7 +230,7 @@ class PitView extends SurfaceView implements Runnable {
             PitofSnake.vibrator.vibrate(50);
         }
     }
-
+    //When mass is eaten, increasing snake length by 3, spawn new mass and increment score by 2, play sound effect
     private void eatMass() {
         snakeLength = snakeLength + 3;
         spawnMass();
@@ -274,21 +283,24 @@ class PitView extends SurfaceView implements Runnable {
 
         return dead;
     }
-
+    //Keeps the game running
     public void updateGame() {
+        //Checks if a mouse has been eaten
         if (snakeXs[0] == mouseX && snakeYs[0] == mouseY ) {
             eatMouse();
         }
         moveSnake();
+        //checks if a Speed upgrade is eaten
         if (snakeXs[0] == speedX  && snakeYs[0] == speedY ) {
             eatSpeed();
         }
         moveSnake();
-
+        //check if a Mass upgrade is eaten
         if (snakeXs[0] == massX && snakeYs[0] == massY) {
             eatMass();
         }
         moveSnake();
+        //If the player died
         if (detectDeath()) {
             playSoundEffectDeath();
 
@@ -301,7 +313,7 @@ class PitView extends SurfaceView implements Runnable {
 
         }
     }
-
+    //class to drawn the game
     public void drawGame() {
         if (holder.getSurface().isValid()) {
             canvas = holder.lockCanvas();
@@ -316,7 +328,7 @@ class PitView extends SurfaceView implements Runnable {
             paint.setColor(Color.argb(255, 255, 255, 255));
             paint2.setColor(Color.argb( 255, 255, 0 ,0));
             paint2.setColor(Color.argb( 255, 0, 0, 255));
-
+            //set up score on UI
             paint.setTextSize(30);
             canvas.drawText("Score:" + score, 15, 30, paint);
 
@@ -354,7 +366,7 @@ class PitView extends SurfaceView implements Runnable {
             holder.unlockCanvasAndPost(canvas);
         }
     }
-
+    //Keep the game running
     public boolean checkForUpdate() {
         if(nextFrameTime <= System.currentTimeMillis()){
             nextFrameTime =System.currentTimeMillis() + MILLIS_IN_A_SECOND / FPS;
@@ -370,7 +382,7 @@ class PitView extends SurfaceView implements Runnable {
         // The check for m_Playing prevents a crash at the start
         while (playing) {
 
-            // Update 10 times a second
+            // Update the amount of times the current FPS is
             if(checkForUpdate()) {
                 updateGame();
                 drawGame();
