@@ -1,5 +1,5 @@
 package kristof.pitofsnake;
-
+//Work done by Tushar Mittal
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -20,7 +20,8 @@ public class CreditsActivity extends Activity {
 
         animation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.credits);
         textView = (TextView) findViewById(R.id.textView);
-        textView.setText("CREDITS \n" + "Tushar\n" + "Ronan\n" + "Kristof");
+        textView.setText("CREDITS \n" + "Graphics and Menus     Tushar\n" + "Game Engine        Ronan and Kristof\n" + "BackGround Music        www.soundbible.com\n"
+                + "Sound effects       www.AndroidGamePrograming.com");
 
         textView.startAnimation(animation);
     }

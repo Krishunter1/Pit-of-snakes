@@ -113,6 +113,7 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
 
     }
 
+    //on back pressed bring back to home screen
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, HomeScreen.class);

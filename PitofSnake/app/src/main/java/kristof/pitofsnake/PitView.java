@@ -3,7 +3,7 @@ package kristof.pitofsnake;
 //The reason the game is not running on Matrixes but instead uses Draw class
 //is because the Draw class was the easiest way to implement the old style Snake game feel
 //while being able to implement more modern touches with power ups.
-//Also a activity with choice of game mode wasin't made as we were having difficult implementing it properly
+//Also a activity with choice of game mode wasn't made as we were having difficult implementing it properly
 //However the power ups act as if the game modes were selected, so the player is able to pick them up
 //and change there game experience if they choose to do so.
 import android.content.Context;
