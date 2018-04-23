@@ -13,7 +13,7 @@
         android:layout_height="49dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="60dp"
         android:background="@null"
         android:onClick="onClickStopEffect"
         android:scaleType="fitXY"
@@ -42,7 +42,7 @@
         android:layout_width="99dp"
         android:layout_height="49dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="60dp"
         android:src="@drawable/speaker1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -61,7 +61,7 @@
         android:id="@+id/imageButton"
         android:layout_width="215dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="50dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:background="@null"
@@ -72,6 +72,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/instructions"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/music" />
 
 
 </android.support.constraint.ConstraintLayout>
