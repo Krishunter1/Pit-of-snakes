@@ -2,14 +2,18 @@ package kristof.pitofsnake;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.preference.PreferenceManager;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import java.io.IOException;
@@ -77,9 +81,9 @@ class PitView extends SurfaceView implements Runnable {
     private int massX;
     private int massY;
 
+    private boolean soundfx; //stores the user selection of sound effects
     private int score;
     public static Context context;
-
 
     // The size in pixels of a snake segment
     private int blockSize;
@@ -103,6 +107,10 @@ class PitView extends SurfaceView implements Runnable {
 
         // Set the sound up
         loadSound();
+
+        //load the value of sound effects
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(m_context);
+        soundfx = sharedPreferences.getBoolean("sound_fx", true);
 
         // Initialize the drawing objects
         holder = getHolder();
@@ -166,8 +174,7 @@ class PitView extends SurfaceView implements Runnable {
         snakeLength++;
         spawnMouse();
         score = score + 1;
-        SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
-        PitofSnake.vibrator.vibrate(200);
+        playSoundEffectsMouse();
     }
     public void spawnSpeed() {
         Random random2 = new Random();
@@ -193,17 +200,33 @@ class PitView extends SurfaceView implements Runnable {
         }
         spawnSpeed();
         score = score + 1;
-        SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
-        PitofSnake.vibrator.vibrate(200);
+
+        playSoundEffectsMouse();
     }
 
+    //method called to play sound after eating food
+    private void playSoundEffectsMouse() {
+        //checks if the user wants the sound effects to be played
+        if(soundfx) {
+            SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+            PitofSnake.vibrator.vibrate(200);
+        }
+    }
+
+    //method called to play sound effect on death
+    private void playSoundEffectDeath() {
+        //checks if the user wants the sound effects to be played
+        if(soundfx) {
+            SoundPool.play(m_dead_sound, 1, 1, 0, 0, 1);
+            PitofSnake.vibrator.vibrate(50);
+        }
+    }
 
     private void eatMass() {
         snakeLength = snakeLength + 3;
         spawnMass();
         score = score + 2;
-        SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
-        PitofSnake.vibrator.vibrate(200);
+        playSoundEffectsMouse();
     }
 
     private void moveSnake(){
@@ -267,23 +290,28 @@ class PitView extends SurfaceView implements Runnable {
         }
         moveSnake();
         if (detectDeath()) {
-            //start again
-            SoundPool.play(m_dead_sound, 1, 1, 0, 0, 1);
+            playSoundEffectDeath();
 
+            //The current score is sent to the activity named ScoreActivity and the activity is called
             context = PitofSnake.getContext();
             Intent intent = new Intent(context, ScoreActivity.class);
             intent.putExtra("score",score);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            PitofSnake.vibrator.vibrate(50);
+
         }
     }
 
     public void drawGame() {
         if (holder.getSurface().isValid()) {
             canvas = holder.lockCanvas();
-            //background colour
-            canvas.drawColor(Color.argb(255, 120, 197, 87));
+
+            //load a bitmap image and set it to the screen
+            Bitmap b = BitmapFactory.decodeResource(getResources(),R.drawable.back);
+            Bitmap background = Bitmap.createScaledBitmap
+                    (b, screenWidth, screenHeight, true);
+            canvas.drawBitmap(background,0,0,null);
+
             //Snake colour
             paint.setColor(Color.argb(255, 255, 255, 255));
             paint2.setColor(Color.argb( 255, 255, 0 ,0));

@@ -10,6 +10,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 
 //THe game in its current stage is pretty simplistic, we had the menu screen to play the game and go into options
 //however, prehaps becasue we were using Dropbox until now, the activites and Layouts havent fully passed on
@@ -33,7 +34,8 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
         super.onCreate(savedInstanceState);
         detector = new GestureDetectorCompat(this,this);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //find out the width and height of the screen
         Display display = getWindowManager().getDefaultDisplay();
 
@@ -43,6 +45,7 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
         mContext = getBaseContext();
         // Create a new View based on the SnakeView class
         pitView = new PitView(this, size);
+
 
         // Make snakeView the default view of the Activity
         setContentView(pitView);
@@ -142,4 +145,5 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
 
         return false;
     }
+
 }

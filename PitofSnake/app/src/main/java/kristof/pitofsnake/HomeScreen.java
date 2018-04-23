@@ -9,26 +9,40 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 
+//work done by Tushar Mittal
 public class HomeScreen extends Activity {
+
     private static MediaPlayer player;
-    private boolean musicPlay = true;
-    private static final String MUSIC_PLAY = "music-play";
+    private static MediaPlayer buttonsound;
+    private boolean musicPlay = true; //stores if the background music is to be played or not
+    private boolean fxPlay = true; //stores if the sound effects are to be played or not
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_home_screen);
-        player = MediaPlayer.create(this, R.raw.backgroundsong);
+        player = MediaPlayer.create(this, R.raw.backgroundsong); //creates a mediaPlayer with background music file
         player.setLooping(true);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        musicPlay = sharedPreferences.getBoolean("music_value", true);
+        LoadPreferences();
         if(musicPlay) {
             startBackgroundmusic(musicPlay);
         }
     }
 
+    //Method is called to play button sound effect
+    public void playButtonSound() {
+        buttonsound = MediaPlayer.create(this, R.raw.buttonsound);
+        //checks if the soundeffects value is true
+        if(fxPlay) {
+            buttonsound.start();
+        }
+    }
+
+    //Method is called to play background music
     public void startBackgroundmusic(boolean value) {
+        //it is checked if the user wants to play the background music or not
         if(value) {
             player.start();
         }
@@ -37,29 +51,26 @@ public class HomeScreen extends Activity {
         }
     }
 
-    private void SavePreferences(){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor2 = sharedPreferences.edit();
-        editor2.putBoolean(MUSIC_PLAY, musicPlay);
-        editor2.commit();
-    }
-
+    /*This method loads the selections made by the user in the menu screen if it's the first time user has
+     * started the application then the values are set as default to true
+     */
     private void LoadPreferences(){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        musicPlay = sharedPreferences.getBoolean(MUSIC_PLAY, musicPlay);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        musicPlay = sharedPreferences.getBoolean("music_value", true);
+        fxPlay = sharedPreferences.getBoolean("sound_fx", true);
     }
 
+    //event listener method to open menu screen
     public void onClickSend(View view) {
-        MediaPlayer buttonsound = MediaPlayer.create(this, R.raw.buttonsound);
-        buttonsound.start();
+        playButtonSound();
         Intent intent = new Intent(this, MenuScreen.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        overridePendingTransition(R.anim.right_in, R.anim.left_out); //animation used to open menu screen
     }
 
+    //event listener method to start the game
     public void onClickStart(View view) {
-        MediaPlayer buttonsound = MediaPlayer.create(this, R.raw.buttonsound);
-        buttonsound.start();
+        playButtonSound();
         Intent intent = new Intent(this, PitofSnake.class);
         startActivity(intent);
     }
@@ -68,17 +79,5 @@ public class HomeScreen extends Activity {
     protected void onResume() {
         super.onResume();
         LoadPreferences();
-    }
-
-    @Override
-    protected void onPause() {
-        SavePreferences();
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        SavePreferences();
-        super.onStop();
     }
 }
