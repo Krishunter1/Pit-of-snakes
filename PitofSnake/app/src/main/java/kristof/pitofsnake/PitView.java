@@ -30,6 +30,9 @@ class PitView extends SurfaceView implements Runnable {
     private SurfaceHolder holder;
     // This lets us control colors etc
     private Paint paint;
+    private Paint paint2;
+    private Paint paint3;
+
 
     // This will be a reference to the Activity
     private Context m_context;
@@ -104,6 +107,8 @@ class PitView extends SurfaceView implements Runnable {
         // Initialize the drawing objects
         holder = getHolder();
         paint = new Paint();
+        paint2 = new Paint();
+        paint3 = new Paint();
 
         // If you score 200 you are rewarded with a crash achievement!
         snakeXs = new int[200];
@@ -121,6 +126,8 @@ class PitView extends SurfaceView implements Runnable {
 
         // And a mouse to eat
         spawnMouse();
+        spawnSpeed();
+        spawnMass();
 
         // Reset the m_Score
         score = 0;
@@ -153,28 +160,25 @@ class PitView extends SurfaceView implements Runnable {
         Random random = new Random();
         mouseX = random.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
         mouseY = random.nextInt(numBlocksHigh - 1) + 1;
-}
+    }
 
     private void eatMouse() {
         snakeLength++;
         spawnMouse();
         score = score + 1;
         SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+        PitofSnake.vibrator.vibrate(200);
     }
     public void spawnSpeed() {
-        if( score == 10 || score == 25 || score == 40 || score ==55) {
-            Random random2 = new Random();
-            speedX = random2.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
-            speedY = random2.nextInt(numBlocksHigh - 1) + 1;
-        }
+        Random random2 = new Random();
+        speedX = random2.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
+        speedY = random2.nextInt(numBlocksHigh - 1) + 1;
     }
 
     public void spawnMass() {
-        if( score == 15 || score == 30 || score == 50) {
-            Random random3 = new Random();
-            massX = random3.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
-            massY = random3.nextInt(numBlocksHigh - 1) + 1;
-        }
+        Random random3 = new Random();
+        massX = random3.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
+        massY = random3.nextInt(numBlocksHigh - 1) + 1;
     }
 
     private void eatSpeed() {
@@ -190,14 +194,16 @@ class PitView extends SurfaceView implements Runnable {
         spawnSpeed();
         score = score + 1;
         SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+        PitofSnake.vibrator.vibrate(200);
     }
 
 
     private void eatMass() {
-        snakeLength = snakeLength + 2;
+        snakeLength = snakeLength + 3;
         spawnMass();
         score = score + 2;
         SoundPool.play(m_get_mouse_sound, 1, 1, 0, 0, 1);
+        PitofSnake.vibrator.vibrate(200);
     }
 
     private void moveSnake(){
@@ -232,10 +238,10 @@ class PitView extends SurfaceView implements Runnable {
     private boolean detectDeath(){
         boolean dead = false;
         //check if a wall has been hit on the edge of the screen
-        if (snakeXs[0] == -1) dead = true;
+        if (snakeXs[0] <= -1) dead = true;
         if (snakeXs[0] >= NUM_BLOCKS_WIDE) dead = true;
-        if (snakeYs[0] == -1) dead = true;
-        if (snakeYs[0] == numBlocksHigh) dead = true;
+        if (snakeYs[0] <= -1) dead = true;
+        if (snakeYs[0] >= numBlocksHigh) dead = true;
         //check if player ran head into the body
         for (int i = snakeLength - 1; i > 0; i--) {
             if ((i > 4) && (snakeXs[0] == snakeXs[i]) && (snakeYs[0] == snakeYs[i])) {
@@ -247,14 +253,15 @@ class PitView extends SurfaceView implements Runnable {
     }
 
     public void updateGame() {
-        if (snakeXs[0] == mouseX && snakeYs[0] == mouseY) {
+        if (snakeXs[0] == mouseX && snakeYs[0] == mouseY ) {
             eatMouse();
         }
         moveSnake();
-        if (snakeXs[0] == speedX && snakeYs[0] == speedY) {
+        if (snakeXs[0] == speedX  && snakeYs[0] == speedY ) {
             eatSpeed();
         }
         moveSnake();
+
         if (snakeXs[0] == massX && snakeYs[0] == massY) {
             eatMass();
         }
@@ -268,6 +275,7 @@ class PitView extends SurfaceView implements Runnable {
             intent.putExtra("score",score);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+            PitofSnake.vibrator.vibrate(50);
         }
     }
 
@@ -278,9 +286,11 @@ class PitView extends SurfaceView implements Runnable {
             canvas.drawColor(Color.argb(255, 120, 197, 87));
             //Snake colour
             paint.setColor(Color.argb(255, 255, 255, 255));
+            paint2.setColor(Color.argb( 255, 255, 0 ,0));
+            paint2.setColor(Color.argb( 255, 0, 0, 255));
 
             paint.setTextSize(30);
-            canvas.drawText("Score:" + score, 10, 30, paint);
+            canvas.drawText("Score:" + score, 15, 30, paint);
 
             //Draw the snake
             for (int i = 0; i < snakeLength; i++) {
@@ -297,6 +307,20 @@ class PitView extends SurfaceView implements Runnable {
                     (mouseX * blockSize) + blockSize,
                     (mouseY * blockSize) + blockSize,
                     paint);
+
+            //draw speed boost
+            canvas.drawRect(speedX * blockSize,
+                    (speedY * blockSize),
+                    (speedX * blockSize) + blockSize,
+                    (speedY * blockSize) + blockSize,
+                    paint2);
+
+            //draw mass boost
+            canvas.drawRect(massX * blockSize,
+                    (massY *blockSize),
+                    (massX * blockSize) + blockSize,
+                    (massY * blockSize) + blockSize,
+                    paint3);
 
             // Draw the whole frame
             holder.unlockCanvasAndPost(canvas);

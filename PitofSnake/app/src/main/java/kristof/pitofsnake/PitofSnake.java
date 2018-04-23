@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -20,17 +21,18 @@ public class PitofSnake extends Activity implements GestureDetector.OnGestureLis
     PitView pitView;
     // We will initialize it in onCreate
     // once we have more details about the Player's device
-    private static final int SWIPE_MIN_DISTANCE = 5;
+    private static final int SWIPE_MIN_DISTANCE = 100;
     private static final int SWIPE_MAX_OFF_PATH = 3000;
     private static final int SWIPE_THRESHOLD_VELOCITY = 1500;
     public static Context mContext;
     private GestureDetectorCompat detector;
+    public static Vibrator vibrator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         detector = new GestureDetectorCompat(this,this);
-
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         //find out the width and height of the screen
         Display display = getWindowManager().getDefaultDisplay();
